@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Spin &amp; Win — Restaurant Demo | Busy Biz Solution</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--navy:#16324F;--coral:#FF6B5E;--mist:#F7F9FB;--slate:#5B6B7B;--gold:#F5B301;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',sans-serif;background:radial-gradient(circle at 50% 0%,#1f4266,#16324F);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;color:#fff}
+.game{width:100%;max-width:440px;background:#fff;border-radius:26px;padding:30px 26px 34px;text-align:center;box-shadow:0 24px 60px rgba(0,0,0,.35);color:var(--navy)}
+.brandrow{display:flex;align-items:center;justify-content:center;gap:6px;font-family:'Poppins';font-weight:800;font-size:18px;color:var(--navy);margin-bottom:4px}
+.brandrow i{width:8px;height:8px;border-radius:50%;background:var(--coral);display:inline-block}
+.eyebrow{font-family:'Poppins';font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);margin-bottom:14px}
+h1{font-family:'Poppins';font-weight:800;font-size:26px;margin-bottom:6px}
+.tag{color:var(--slate);font-size:14px;margin-bottom:20px}
+.wheel-wrap{position:relative;width:300px;height:300px;margin:0 auto 26px}
+canvas{width:300px;height:300px;border-radius:50%;box-shadow:0 10px 30px rgba(22,50,79,.25);}
+.pointer{position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:16px solid transparent;border-right:16px solid transparent;border-top:26px solid var(--coral);filter:drop-shadow(0 3px 3px rgba(0,0,0,.25));z-index:3}
+.hub{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;background:#fff;border:4px solid var(--navy);display:flex;align-items:center;justify-content:center;font-family:'Poppins';font-weight:800;color:var(--navy);font-size:11px;z-index:2}
+.btn{font-family:'Poppins';font-weight:700;font-size:17px;color:#fff;background:var(--coral);border:none;border-radius:999px;padding:15px 44px;cursor:pointer;transition:.2s;box-shadow:0 8px 20px rgba(255,107,94,.4)}
+.btn:hover:not(:disabled){transform:translateY(-2px)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.result{margin-top:22px;min-height:20px}
+.result.win{animation:pop .4s ease}
+@keyframes pop{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+.prize{font-family:'Poppins';font-weight:800;font-size:22px;color:var(--navy)}
+.code{display:inline-block;margin-top:10px;background:var(--mist);border:2px dashed var(--coral);border-radius:12px;padding:10px 18px;font-family:'Poppins';font-weight:700;letter-spacing:.12em;color:var(--coral)}
+.sub{font-size:13px;color:var(--slate);margin-top:10px}
+.foot{margin-top:22px;font-size:11px;color:#9aa5b1}
+</style>
+</head>
+<body>
+<div class="game">
+  <div class="brandrow">busy biz<i></i></div>
+  <div class="eyebrow">Restaurant demo</div>
+  <h1>🍽️ Spin &amp; Win!</h1>
+  <p class="tag">Spin the wheel for a treat on your next visit.</p>
+  <div class="wheel-wrap">
+    <div class="pointer"></div>
+    <canvas id="wheel" width="600" height="600"></canvas>
+    <div class="hub">SPIN</div>
+  </div>
+  <button class="btn" id="spinBtn">SPIN NOW</button>
+  <div class="result" id="result"></div>
+  <div class="foot">Demo game by Busy Biz Solution · rebrandable per client</div>
+</div>
+<script>
+const prizes = [
+  { label: "Free Dessert", code: "SWEET", color: "#16324F" },
+  { label: "10% Off", code: "TENOFF", color: "#FF6B5E" },
+  { label: "Free Drink", code: "SIPFREE", color: "#1f4266" },
+  { label: "Free Starter", code: "STARTER", color: "#F5B301" },
+  { label: "15% Off", code: "FIFTEEN", color: "#2b5a86" },
+  { label: "Try Again", code: null, color: "#5B6B7B" }
+];
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const N = prizes.length, R = 300, seg = (2*Math.PI)/N;
+function draw(rot){
+  ctx.clearRect(0,0,600,600);
+  ctx.save(); ctx.translate(R,R); ctx.rotate(rot);
+  for(let i=0;i<N;i++){
+    const a0=i*seg, a1=a0+seg;
+    ctx.beginPath(); ctx.moveTo(0,0); ctx.arc(0,0,R-6,a0,a1); ctx.closePath();
+    ctx.fillStyle=prizes[i].color; ctx.fill();
+    ctx.save(); ctx.rotate(a0+seg/2);
+    ctx.textAlign="right"; ctx.fillStyle="#fff";
+    ctx.font="700 30px Poppins, sans-serif";
+    ctx.fillText(prizes[i].label, R-40, 10);
+    ctx.restore();
+  }
+  ctx.restore();
+}
+let current=0, spinning=false;
+draw(-Math.PI/2);
+function easeOut(t){return 1-Math.pow(1-t,3);}
+document.getElementById('spinBtn').addEventListener('click',()=>{
+  if(spinning) return; spinning=true;
+  document.getElementById('spinBtn').disabled=true;
+  document.getElementById('result').innerHTML="";
+  const win=Math.floor(Math.random()*N);
+  // pointer at top (-90deg). center of segment win should land at top.
+  const target = (2*Math.PI*5) + (-Math.PI/2) - (win*seg + seg/2);
+  const start=current, dur=4200, t0=performance.now();
+  function frame(now){
+    const p=Math.min((now-t0)/dur,1); const e=easeOut(p);
+    current=start+(target-start)*e; draw(current);
+    if(p<1){requestAnimationFrame(frame);} else {finish(win);}
+  }
+  requestAnimationFrame(frame);
+});
+function finish(win){
+  spinning=false; const r=document.getElementById('result'); const pz=prizes[win];
+  if(pz.code){
+    r.className="result win";
+    r.innerHTML=`<div class="prize">🎉 You won: ${pz.label}!</div>
+      <div class="code">${pz.code}</div>
+      <div class="sub">Show this code at the counter to redeem.</div>`;
+  }else{
+    r.className="result win";
+    r.innerHTML=`<div class="prize">So close! 😄</div>
+      <div class="sub">No prize this spin — come back tomorrow for another go!</div>`;
+    setTimeout(()=>{document.getElementById('spinBtn').disabled=false;},600);
+  }
+}
+</script>
+</body>
+</html>

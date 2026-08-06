@@ -120,6 +120,9 @@ img{max-width:100%}
 .game-ph h3{font-size:20px}
 .game-ph p{color:var(--slate);font-size:15px;margin-bottom:16px}
 .game-tag{font-family:'Poppins';font-weight:600;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--coral-d);background:#fff0ee;padding:6px 12px;border-radius:999px}
+.game-slot.live .game-ph{background:#fff;border:1px solid var(--line)}
+.game-slot.live .game-ph .btn{margin-top:6px}
+.game-slot.live:hover .game-ph-ic{transform:scale(1.1);transition:.2s}
 
 /* steps */
 .step{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:28px 24px;box-shadow:var(--shadow)}

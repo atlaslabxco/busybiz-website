@@ -14,20 +14,23 @@ Hero · What we do (3 pillars) · Signature "Gamified Growth Campaign" · **Mini
 
 No pricing is shown — all enquiry-based and custom-quoted.
 
-## 🎮 Mini-game slots (for Eric)
-Three placeholder cards live in the **`#games`** section, marked with clear HTML comments:
-- `#game-1` — Spin & Win
-- `#game-2` — Quiz / Trivia
-- `#game-3` — UGC Challenge
+## 🎮 Mini-games (3 live demos)
+Three playable, self-contained games live in **`/games`** — one per industry. Each is a single HTML file (inline CSS + JS), mobile-friendly, and rebrandable via the CSS variables at the top and the data arrays in the script.
 
-To plug in a real game, replace the `.game-ph` block inside each `.game-slot` with your game's markup or an `<iframe>` embed.
+| Vertical | Game | File |
+|---|---|---|
+| Restaurant | Spin & Win (prize wheel) | `games/restaurant-spin.html` |
+| FMCG | Superfan Quiz (5-question MCQ + reward) | `games/fmcg-quiz.html` |
+| Event | Scratch & Win (scratch-to-reveal card) | `games/event-scratch.html` |
+
+They're linked from the site's `#games` section ("Play the demo"). To rebrand: change `--navy` / `--coral` in each file's `:root`, and edit the `prizes` / `QUESTIONS` / `PRIZES` arrays for copy and rewards.
 
 ## To do before launch
 - [ ] Wire the contact form to Formspree / email (see `TODO` in `script.js`)
 - [ ] Add real client logos in the trust strip
 - [ ] Add case studies / results
 - [ ] Point a domain + enable HTTPS
-- [ ] Plug in the 3 live mini-games
+- [ ] Rebrand each mini-game's colours + prizes per client
 
 ## Preview locally
 Open `index.html` in a browser, or serve the folder:
