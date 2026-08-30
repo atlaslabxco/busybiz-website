@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Chef's Catch — The Test Kitchen</title>
+<style>
+:root{
+  --brand:#B21F2D; --brand2:#7A1420; --gold:#E9B44C; --cream:#FFF7EC; --ink:#22181A; --good:#1E8E4E; --bad:#D23B2E;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Segoe UI',system-ui,-apple-system,Roboto,sans-serif;color:var(--ink);
+  background:linear-gradient(180deg,#FFE7B8 0%,#FFD79A 40%,#F6B36B 100%);height:100dvh;}
+#game{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;overflow:hidden;}
+.top{width:100%;max-width:520px;padding:10px 12px 6px;display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.brand{display:flex;align-items:center;gap:7px;font-weight:800;color:var(--brand2);font-size:13.5px;min-width:0;overflow:hidden;flex-shrink:1;}
+.brand #rn{min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.brand .b{width:28px;height:28px;border-radius:9px;background:var(--brand);color:#fff;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.hud{display:flex;gap:8px;flex-shrink:0;}
+.chip{background:#fff;border-radius:12px;padding:5px 11px;font-weight:800;font-size:14px;box-shadow:0 3px 8px rgba(0,0,0,.12);text-align:center;min-width:48px;}
+.chip .lab{font-size:9px;color:#9a8f8a;display:block;font-weight:700;letter-spacing:.06em;text-transform:uppercase;}
+.chip.score{color:var(--brand);} .chip.time{color:#7A1420;}
+#stage{position:relative;width:100%;max-width:520px;flex:1 1 auto;min-width:0;min-height:0;margin:4px 0;overflow:hidden;border-top:3px solid rgba(255,255,255,.5);}
+canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-action:none;}
+.foot{width:100%;max-width:520px;text-align:center;padding:6px 0 10px;color:#7a5a2a;font-size:12px;font-weight:600;}
+.foot b{color:var(--brand2);}
+
+.overlay{position:fixed;inset:0;background:rgba(122,20,32,.82);display:flex;align-items:center;justify-content:center;padding:22px;z-index:10;text-align:center;}
+.overlay.hide{display:none;}
+.card{background:var(--cream);border-radius:22px;padding:26px 22px;max-width:360px;width:100%;box-shadow:0 18px 44px rgba(0,0,0,.35);}
+.card .big{font-size:52px;}
+.card h1{font-size:26px;font-weight:900;color:var(--brand);margin:4px 0;}
+.card p{font-size:14.5px;color:#6b5b53;line-height:1.5;margin-bottom:6px;}
+.rules{display:flex;justify-content:center;gap:18px;margin:14px 0;}
+.rule{font-size:13px;font-weight:700;}
+.rule .e{font-size:26px;display:block;}
+.rule.g{color:var(--good);} .rule.b{color:var(--bad);}
+.btn{width:100%;background:var(--brand);color:#fff;border:none;border-radius:15px;padding:16px;font-size:19px;font-weight:900;cursor:pointer;margin-top:10px;box-shadow:0 8px 18px rgba(0,0,0,.25);}
+.btn:active{transform:scale(.98);}
+.scoreBig{font-size:60px;font-weight:900;color:var(--brand);line-height:1;margin:8px 0;}
+.tag{display:inline-block;background:#FFF2CE;color:#7a5a00;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-top:8px;}
+</style>
+</head>
+<body>
+<div id="game">
+<div class="top">
+  <div class="brand"><span class="b">🍜</span><span id="rn">The Test Kitchen</span></div>
+  <div class="hud">
+    <div class="chip score"><span class="lab">Score</span><span id="scoreV">0</span></div>
+    <div class="chip time"><span class="lab">Time</span><span id="timeV">45</span></div>
+  </div>
+</div>
+
+<div id="stage">
+  <canvas id="cv"></canvas>
+
+  <!-- START -->
+  <div class="overlay" id="startOv">
+    <div class="card">
+      <div class="big">👨‍🍳</div>
+      <h1>Chef's Catch</h1>
+      <p>Slide the chef <b>left &amp; right</b> to catch the falling ingredients. Fill the kitchen — but <b>dodge the bombs!</b></p>
+      <div class="rules">
+        <div class="rule g"><span class="e">🍤</span>+ points</div>
+        <div class="rule b"><span class="e">💣</span>− points</div>
+      </div>
+      <p style="font-size:12.5px;color:#9a8f8a">45 seconds · drag anywhere to move</p>
+      <button class="btn" id="startBtn">START COOKING 🔥</button>
+    </div>
+  </div>
+
+  <!-- END -->
+  <div class="overlay hide" id="endOv">
+    <div class="card">
+      <div class="big">🏆</div>
+      <h1>Time's Up!</h1>
+      <p>Your final score</p>
+      <div class="scoreBig" id="finalScore">0</div>
+      <div class="tag" id="rank">Nice cooking!</div>
+      <button class="btn" id="againBtn">Play Again 🔁</button>
+    </div>
+  </div>
+</div>
+
+<div class="foot">Powered by <b>Busy Biz</b></div>
+</div>
+
+<script>
+/* ================= CONFIG ================= */
+const RESTAURANT = "The Test Kitchen";
+const LOGO = "🍜";
+const DURATION = 45;                 // seconds
+const BOMB_PENALTY = -15;
+const CHEF = "👨‍🍳";
+// good ingredients: [emoji, points]
+const GOODS = [["🍤",20],["🦐",20],["🥩",20],["🍅",10],["🥬",10],["🍄",10],["🧄",10],["🥕",10],["🧅",10],["🥚",10],["🌽",10],["🧀",15]];
+const BOMB = "💣";
+const BOMB_CHANCE = 0.20;            // 20% of spawns are bombs
+/* ========================================= */
+
+document.getElementById('rn').textContent = RESTAURANT;
+document.querySelector('.brand .b').textContent = LOGO;
+document.title = "Chef's Catch — " + RESTAURANT;
+
+const cv=document.getElementById('cv'), ctx=cv.getContext('2d'), stage=document.getElementById('stage');
+let W=0,H=0,dpr=1;
+function resize(){ const r=stage.getBoundingClientRect(); dpr=Math.min(window.devicePixelRatio||1,2);
+  cv.width=r.width*dpr; cv.height=r.height*dpr; ctx.setTransform(dpr,0,0,dpr,0,0); W=r.width; H=r.height;
+  chef.y=H-58; if(!running){ chef.x=W/2; targetX=W/2; } }
+window.addEventListener('resize',resize);
+
+const chef={x:0,y:0,w:64}; let targetX=0;
+let items=[], floats=[], score=0, tLeft=DURATION, running=false, last=0, spawnTimer=0, elapsed=0;
+
+function reset(){ items=[]; floats=[]; score=0; tLeft=DURATION; elapsed=0; spawnTimer=0; chef.x=W/2; targetX=W/2;
+  document.getElementById('scoreV').textContent=0; document.getElementById('timeV').textContent=DURATION; }
+
+function spawn(){
+  const bomb = Math.random()<BOMB_CHANCE;
+  let emoji,pts;
+  if(bomb){ emoji=BOMB; pts=BOMB_PENALTY; }
+  else { const g=GOODS[Math.floor(Math.random()*GOODS.length)]; emoji=g[0]; pts=g[1]; }
+  const prog = elapsed/DURATION;               // 0..1 difficulty ramp
+  const speed = 190 + prog*260 + Math.random()*80;   // px/sec
+  items.push({x:26+Math.random()*(W-52), y:-30, vy:speed, emoji, pts, bomb, r:20, rot:(Math.random()-.5)*0.6});
+}
+
+function tick(t){
+  if(!running) return;
+  const dt=Math.min((t-last)/1000,0.05); last=t;
+  elapsed+=dt; tLeft-=dt;
+  // chef follow
+  chef.x += (targetX-chef.x)*Math.min(1,dt*14);
+  chef.x=Math.max(chef.w/2, Math.min(W-chef.w/2, chef.x));
+  // spawn ramp: interval 820ms -> 380ms
+  spawnTimer-=dt; const interval=0.82 - (elapsed/DURATION)*0.44;
+  if(spawnTimer<=0){ spawn(); spawnTimer=interval; }
+  // update items
+  for(let i=items.length-1;i>=0;i--){ const it=items[i]; it.y+=it.vy*dt;
+    // catch check near chef line
+    if(it.y >= chef.y-24 && it.y <= chef.y+16 && Math.abs(it.x-chef.x) < chef.w/2+16){
+      score+=it.pts; if(score<0) score=0;
+      floats.push({x:it.x,y:chef.y-30,txt:(it.pts>0?'+':'')+it.pts,life:0.8,color:it.pts>0?'#1E8E4E':'#D23B2E'});
+      if(it.bomb) floats.push({x:it.x,y:chef.y-52,txt:'💥',life:0.6,color:'#000',big:true});
+      items.splice(i,1); continue;
+    }
+    if(it.y>H+30) items.splice(i,1);
+  }
+  // floats
+  for(let i=floats.length-1;i>=0;i--){ floats[i].y-=40*dt; floats[i].life-=dt; if(floats[i].life<=0) floats.splice(i,1); }
+  document.getElementById('scoreV').textContent=score;
+  document.getElementById('timeV').textContent=Math.max(0,Math.ceil(tLeft));
+  render();
+  if(tLeft<=0){ end(); return; }
+  requestAnimationFrame(tick);
+}
+
+function render(){
+  ctx.clearRect(0,0,W,H);
+  // faint plate/counter under chef
+  ctx.fillStyle='rgba(255,255,255,.35)'; ctx.beginPath();
+  ctx.ellipse(chef.x, chef.y+22, chef.w/2+10, 12, 0, 0, Math.PI*2); ctx.fill();
+  // items
+  ctx.textAlign='center'; ctx.textBaseline='middle';
+  for(const it of items){ ctx.save(); ctx.translate(it.x,it.y); ctx.rotate(it.rot); ctx.font='34px serif'; ctx.fillText(it.emoji,0,0); ctx.restore(); }
+  // chef
+  ctx.font='52px serif'; ctx.fillText(CHEF, chef.x, chef.y-6);
+  // floats
+  for(const f of floats){ ctx.globalAlpha=Math.max(0,f.life/0.8); ctx.font=(f.big?'30px':'bold 20px')+' Segoe UI'; ctx.fillStyle=f.color; ctx.fillText(f.txt,f.x,f.y); ctx.globalAlpha=1; }
+}
+
+function start(){ document.getElementById('startOv').classList.add('hide'); document.getElementById('endOv').classList.add('hide');
+  reset(); running=true; last=performance.now(); requestAnimationFrame(tick); }
+function end(){ running=false;
+  document.getElementById('finalScore').textContent=score;
+  const rank = score>=400?'🔥 Master Chef!' : score>=250?'👏 Great catch!' : score>=120?'😋 Nice cooking!' : '🍳 Keep practising!';
+  document.getElementById('rank').textContent=rank;
+  document.getElementById('endOv').classList.remove('hide');
+}
+
+// controls: pointer drag + keyboard
+function ptr(e){ const r=cv.getBoundingClientRect(); const cx=(e.touches?e.touches[0].clientX:e.clientX)-r.left; targetX=cx; }
+cv.addEventListener('pointerdown',ptr); cv.addEventListener('pointermove',e=>{ if(e.pressure>0||e.buttons>0||e.pointerType!=='mouse') ptr(e); });
+cv.addEventListener('touchstart',ptr,{passive:true}); cv.addEventListener('touchmove',ptr,{passive:true});
+window.addEventListener('keydown',e=>{ if(e.key==='ArrowLeft'||e.key==='a') targetX=Math.max(chef.w/2,chef.x-46);
+  if(e.key==='ArrowRight'||e.key==='d') targetX=Math.min(W-chef.w/2,chef.x+46); });
+
+document.getElementById('startBtn').addEventListener('click',start);
+document.getElementById('againBtn').addEventListener('click',start);
+resize(); render();
+</script>
+</body>
+</html>
