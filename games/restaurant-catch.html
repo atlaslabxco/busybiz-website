@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chef's Catch — The Test Kitchen</title>
 <style>
 :root{
@@ -41,8 +41,10 @@ canvas{position:absolute;inset:0;display:block;width:100%;height:100%;touch-acti
 .scoreBig{font-size:60px;font-weight:900;color:var(--brand);line-height:1;margin:8px 0;}
 .tag{display:inline-block;background:#FFF2CE;color:#7a5a00;font-size:12px;font-weight:700;padding:5px 12px;border-radius:20px;margin-top:8px;}
 </style>
+<link rel="stylesheet" href="../game-theme.css">
+<script src="../game-shell.js" defer></script>
 </head>
-<body>
+<body class="bb-demo bb-arcade bb-catch">
 <div id="game">
 <div class="top">
   <div class="brand"><span class="b">🍜</span><span id="rn">The Test Kitchen</span></div>

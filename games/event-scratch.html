@@ -30,14 +30,16 @@ canvas{position:absolute;inset:0;width:320px;height:200px;touch-action:none;curs
 @keyframes pop{0%{transform:scale(.8);opacity:0}100%{transform:scale(1);opacity:1}}
 .foot{margin-top:22px;font-size:11px;color:#9aa5b1}
 </style>
+<link rel="stylesheet" href="../game-theme.css">
+<script src="../game-shell.js" defer></script>
 </head>
-<body>
+<body class="bb-demo bb-standard">
 <div class="game">
   <div class="brandrow">busy biz<i></i></div>
   <div class="eyebrow">Event demo</div>
   <h1>🎪 Scratch &amp; Win</h1>
   <p class="tag">Scratch the card to reveal your booth prize!</p>
-  <div class="hint" id="hint">👆 Scratch with your finger or mouse</div>
+  <div class="hint" id="hint" role="status" aria-live="polite">👆 Scratch with your finger or mouse</div>
   <div class="card-wrap">
     <div class="prize-layer" id="prizeLayer">
       <div class="prize-emoji" id="pEmoji">🎁</div>
@@ -46,6 +48,7 @@ canvas{position:absolute;inset:0;width:320px;height:200px;touch-action:none;curs
     </div>
     <canvas id="scratch" width="640" height="400"></canvas>
   </div>
+  <button class="bb-reveal" type="button" onclick="doReveal()">Reveal reward without scratching</button>
   <div id="codeWrap" class="hidden"><span class="code" id="code"></span></div>
   <button class="btn hidden" id="againBtn">New card</button>
   <div class="foot">Demo game by Busy Biz Solution · prizes are client-configurable</div>

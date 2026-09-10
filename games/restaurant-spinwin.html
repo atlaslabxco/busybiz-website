@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Spin & Win — The Test Kitchen</title>
 <style>
 /* ====== BRAND / CONFIG (change these to rebrand for any restaurant) ====== */
@@ -72,13 +72,15 @@ canvas{border-radius:50%;box-shadow:0 12px 30px rgba(0,0,0,.4),0 0 0 8px rgba(25
 .tiny{font-size:11px;color:var(--muted);margin-top:14px;}
 .pill{display:inline-block;background:#FFF2CE;color:#7a5a00;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-top:8px;}
 </style>
+<link rel="stylesheet" href="../game-theme.css">
+<script src="../game-shell.js" defer></script>
 </head>
-<body>
+<body class="bb-demo bb-standard">
 <div class="wrap">
   <div class="logo" id="logo">🍜</div>
   <div class="rest" id="restName">The Test Kitchen</div>
   <div class="head">Dine-in Rewards</div>
-  <div class="h1">Spin &amp; <span class="g">Win!</span></div>
+  <h1 class="h1">Spin &amp; <span class="g">Win!</span></h1>
   <div class="sub">One free spin — win a treat on your next visit 🎁</div>
 
   <div class="stage">
@@ -88,7 +90,7 @@ canvas{border-radius:50%;box-shadow:0 12px 30px rgba(0,0,0,.4),0 0 0 8px rgba(25
   </div>
 
   <button class="spinbtn" id="spinBtn">SPIN THE WHEEL</button>
-  <div class="foot">1 spin per guest · <b>Powered by Busy Biz</b></div>
+  <div class="foot">Demo rewards · <b>Powered by Busy Biz</b></div>
 </div>
 
 <!-- WIN / LEAD CAPTURE -->
@@ -112,7 +114,7 @@ const PRIZES = [
   { short:"Try\nAgain?",     label:"nothing this time",       weight:2, emoji:"🎲", lose:true },
 ];
 const VALID_DAYS = 7;
-const ONE_PLAY = true; // set false to allow replays (for demoing)
+const ONE_PLAY = false; // set false to allow replays (for demoing)
 /* ============================================ */
 
 document.getElementById('restName').textContent = RESTAURANT;
@@ -170,7 +172,7 @@ btn.addEventListener('click', ()=>{
   const target = (-Math.PI/2) - segCenter; // rotation so seg center is at top
   const spins = 6; // full turns
   const finalRot = target - 2*Math.PI*spins - (curRot % (2*Math.PI));
-  const start = curRot, delta = finalRot - start, dur = 4200, t0 = performance.now();
+  const start = curRot, delta = finalRot - start, dur = matchMedia("(prefers-reduced-motion: reduce)").matches?1:4200, t0 = performance.now();
   function anim(t){
     const p = Math.min((t-t0)/dur,1);
     const ease = 1 - Math.pow(1-p,3);
@@ -183,6 +185,7 @@ btn.addEventListener('click', ()=>{
 });
 
 function showWin(idx){
+  if(!ONE_PLAY){btn.disabled=false;btn.textContent="SPIN AGAIN";}
   const prize = PRIZES[idx];
   const modal = document.getElementById('modal');
   if(prize.lose){
@@ -197,11 +200,11 @@ function showWin(idx){
     <h2>You won</h2>
     <div class="prize">${prize.emoji} ${prize.label}!</div>
     <p>Enter your details to claim it on your next visit.</p>
-    <div class="field"><label>Name</label><input id="fName" placeholder="Your name" autocomplete="name"></div>
-    <div class="field"><label>Phone / WhatsApp</label><input id="fPhone" placeholder="e.g. 012-345 6789" inputmode="tel" autocomplete="tel"></div>
+    <div class="field"><label for="fName">Name</label><input id="fName" placeholder="Your name" autocomplete="name"></div>
+    <div class="field"><label for="fPhone">Phone / WhatsApp</label><input id="fPhone" placeholder="e.g. 012-345 6789" inputmode="tel" autocomplete="tel"></div>
     <div class="err" id="err">Please enter your name and a valid phone number.</div>
     <button class="claim" id="claimBtn">Claim my prize 🎁</button>
-    <div class="tiny">By claiming you agree to be contacted about ${RESTAURANT} offers.</div>`;
+    <div class="tiny">Demo only. Use fictional details; they stay in this browser.</div>`;
   document.getElementById('overlay').classList.add('show');
   document.getElementById('claimBtn').addEventListener('click', ()=>submitLead(prize));
 }

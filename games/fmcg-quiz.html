@@ -36,8 +36,10 @@ h1{font-family:'Poppins';font-weight:800;font-size:26px;text-align:center;margin
 .sub{font-size:13px;color:var(--slate);margin-top:12px}
 .foot{margin-top:24px;font-size:11px;color:#9aa5b1;text-align:center}
 </style>
+<link rel="stylesheet" href="../game-theme.css">
+<script src="../game-shell.js" defer></script>
 </head>
-<body>
+<body class="bb-demo bb-standard">
 <div class="game">
   <div class="brandrow">busy biz<i></i></div>
   <div class="eyebrow">FMCG demo</div>
@@ -55,7 +57,7 @@ h1{font-family:'Poppins';font-weight:800;font-size:26px;text-align:center;margin
     <div class="opts" id="opts"></div>
   </div>
 
-  <div id="endScreen" class="hidden center">
+  <div id="endScreen" class="hidden center" role="status" aria-live="polite">
     <div class="result-title" id="endTitle"></div>
     <div class="score" id="scoreLine"></div>
     <div class="result-msg" id="endMsg"></div>

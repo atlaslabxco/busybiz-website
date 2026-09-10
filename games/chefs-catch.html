@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Chef's Catch</title>
 <style>
   :root{
@@ -96,8 +96,10 @@
   .pop{animation:pop .45s cubic-bezier(.2,1.6,.4,1) both}
   @keyframes pop{from{transform:scale(.6);opacity:0}to{transform:scale(1);opacity:1}}
 </style>
+<link rel="stylesheet" href="../game-theme.css">
+<script src="../game-shell.js" defer></script>
 </head>
-<body>
+<body class="bb-demo bb-arcade bb-chef">
 <div id="stage">
   <canvas id="game"></canvas>
 

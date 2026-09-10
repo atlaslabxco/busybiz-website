@@ -30,8 +30,10 @@ canvas{width:300px;height:300px;border-radius:50%;box-shadow:0 10px 30px rgba(22
 .sub{font-size:13px;color:var(--slate);margin-top:10px}
 .foot{margin-top:22px;font-size:11px;color:#9aa5b1}
 </style>
+<link rel="stylesheet" href="../game-theme.css">
+<script src="../game-shell.js" defer></script>
 </head>
-<body>
+<body class="bb-demo bb-standard">
 <div class="game">
   <div class="brandrow">busy biz<i></i></div>
   <div class="eyebrow">Restaurant demo</div>
@@ -43,7 +45,7 @@ canvas{width:300px;height:300px;border-radius:50%;box-shadow:0 10px 30px rgba(22
     <div class="hub">SPIN</div>
   </div>
   <button class="btn" id="spinBtn">SPIN NOW</button>
-  <div class="result" id="result"></div>
+  <div class="result" id="result" role="status" aria-live="polite"></div>
   <div class="foot">Demo game by Busy Biz Solution · rebrandable per client</div>
 </div>
 <script>
@@ -83,7 +85,7 @@ document.getElementById('spinBtn').addEventListener('click',()=>{
   const win=Math.floor(Math.random()*N);
   // pointer at top (-90deg). center of segment win should land at top.
   const target = (2*Math.PI*5) + (-Math.PI/2) - (win*seg + seg/2);
-  const start=current, dur=4200, t0=performance.now();
+  const start=current, dur=matchMedia("(prefers-reduced-motion: reduce)").matches?1:4200, t0=performance.now();
   function frame(now){
     const p=Math.min((now-t0)/dur,1); const e=easeOut(p);
     current=start+(target-start)*e; draw(current);
@@ -97,11 +99,11 @@ function finish(win){
     r.className="result win";
     r.innerHTML=`<div class="prize">🎉 You won: ${pz.label}!</div>
       <div class="code">${pz.code}</div>
-      <div class="sub">Show this code at the counter to redeem.</div>`;
+      <div class="sub">Example reward only. No real redemption.</div>`;
   }else{
     r.className="result win";
     r.innerHTML=`<div class="prize">So close! 😄</div>
-      <div class="sub">No prize this spin — come back tomorrow for another go!</div>`;
+      <div class="sub">No prize this spin — try again!</div>`;
     setTimeout(()=>{document.getElementById('spinBtn').disabled=false;},600);
   }
 }
