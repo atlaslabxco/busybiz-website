@@ -1,5 +1,5 @@
 'use strict';
-const demoNames={'restaurant-spin.html':'Spin & Win','restaurant-spinwin.html':'Dine-in Rewards','restaurant-catch.html':'Restaurant Catch','chefs-catch.html':'Chef’s Catch','fmcg-quiz.html':'Superfan Quiz','event-scratch.html':'Scratch & Win'};
+const demoNames={'restaurant-spinwin.html':'Dine-in Rewards','chefs-catch.html':'Chef’s Catch','fmcg-quiz.html':'Superfan Quiz','event-scratch.html':'Scratch & Win'};
 const demo=demoNames[location.pathname.split('/').pop()]||'Playable';
 const bar=document.createElement('nav');bar.className='bb-bar';bar.setAttribute('aria-label','Demo navigation');
 const back=document.createElement('a');back.href='../index.html#games';back.textContent='← Back to Busy Biz';
